@@ -48,6 +48,106 @@ task.delay(3, function()
     sg:Destroy()
 end)
 
+-- ==================== 功能控制 UI 面板 ====================
+-- 按 Insert 開啟/關閉面板
+-- 點擊按鈕 = 直接觸發對應快捷鍵（E N K Q H）
+-- 面板半透明、拉長一點
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "ControlPanel"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+-- 主框架（半透明黑底）
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 260, 0, 320)  -- 拉長高度（原本 240 → 320）
+mainFrame.Position = UDim2.new(0.5, -130, 0.4, 0)
+mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+mainFrame.BackgroundTransparency = 0.4      -- 半透明
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Visible = false
+mainFrame.Parent = screenGui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 12)
+corner.Parent = mainFrame
+
+local stroke = Instance.new("UIStroke")
+stroke.Color = Color3.fromRGB(80, 80, 255)
+stroke.Transparency = 0.6
+stroke.Thickness = 1.5
+stroke.Parent = mainFrame
+
+-- 標題
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 35)
+title.BackgroundTransparency = 1
+title.Text = "功能控制面板"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
+title.Parent = mainFrame
+
+-- 按鈕列表（傳送改 K）
+local buttons = {
+    {name = "ESP",      key = Enum.KeyCode.E},
+    {name = "穿牆",     key = Enum.KeyCode.N},
+    {name = "傳送",     key = Enum.KeyCode.K},  -- 改成 K
+    {name = "鎖頭",     key = Enum.KeyCode.Q},
+    {name = "鎖血",     key = Enum.KeyCode.H},
+}
+
+local btnList = {}
+
+for i, btnInfo in ipairs(buttons) do
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0.9, 0, 0, 45)      -- 按鈕高度拉大一點
+    btn.Position = UDim2.new(0.05, 0, 0, 45 + (i-1)*52)
+    btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+    btn.BackgroundTransparency = 0.5          -- 按鈕也半透明
+    btn.Text = btnInfo.name
+    btn.TextColor3 = Color3.fromRGB(200, 200, 200)
+    btn.Font = Enum.Font.GothamSemibold
+    btn.TextSize = 16
+    btn.Parent = mainFrame
+    
+    local btnCorner = Instance.new("UICorner")
+    btnCorner.CornerRadius = UDim.new(0, 10)
+    btnCorner.Parent = btn
+    
+    -- 點擊 = 模擬按下對應快捷鍵
+    btn.MouseButton1Click:Connect(function()
+        local virtualInput = game:GetService("VirtualInputManager")
+        virtualInput:SendKeyEvent(true, btnInfo.key, false, game)
+        task.wait(0.05)
+        virtualInput:SendKeyEvent(false, btnInfo.key, false, game)
+        
+        print(btnInfo.name .. " 已觸發")
+    end)
+    
+    btnList[btnInfo.name] = btn
+end
+
+-- 面板開關（Insert）
+local panelEnabled = false
+UserInputService.InputBegan:Connect(function(input, gp)
+    if gp then return end
+    if input.KeyCode == Enum.KeyCode.Insert then
+        panelEnabled = not panelEnabled
+        mainFrame.Visible = panelEnabled
+    end
+end)
+
+print("功能控制 UI 已載入（半透明版）")
+print("按 Insert 開啟/關閉面板")
+print("點擊按鈕 = 觸發 E / N / K / Q / H 功能")
+
 print("作者065 載入提示已顯示（3秒後消失）")
 -- Rivals 按 K 瞬移到最近敵人腳下（視角不變）
 -- 每次按 K 傳送到距離最近的活著敵人腳下
