@@ -102,7 +102,7 @@ local buttons = {
     {name = "鎖頭",       key = Enum.KeyCode.Q},
     {name = "鎖血",       key = Enum.KeyCode.H},
     {name = "飛行",       key = Enum.KeyCode.F},
-    {name = "自動急殺",   key = Enum.KeyCode.O},
+    {name = "自動擊殺",   key = Enum.KeyCode.O},
 }
 
 local btnList = {}
