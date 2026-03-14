@@ -94,3 +94,55 @@ end)
 
 print("狀態面板已載入")
 print("所有功能預設紅色，按 E/N/F/Q/H 後變綠色，再按恢復紅色")
+
+-- ==================== 作者顯示 (載入時中央跳出 3 秒) ====================
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local LocalPlayer = Players.LocalPlayer
+
+local sg = Instance.new("ScreenGui")
+sg.Name = "AuthorSplash"
+sg.ResetOnSpawn = false
+sg.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+local frame = Instance.new("Frame")
+frame.Size = UDim2.new(0, 280, 0, 100)
+frame.Position = UDim2.new(0.5, -140, 0.5, -50)
+frame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+frame.BackgroundTransparency = 0.3
+frame.BorderSizePixel = 0
+frame.Parent = sg
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 12)
+corner.Parent = frame
+
+local text = Instance.new("TextLabel")
+text.Size = UDim2.new(1, 0, 1, 0)
+text.BackgroundTransparency = 1
+text.Text = "作者 065"
+text.TextColor3 = Color3.fromRGB(255, 215, 0)  -- 金色
+text.TextStrokeTransparency = 0.4
+text.TextStrokeColor3 = Color3.new(0, 0, 0)
+text.Font = Enum.Font.GothamBold
+text.TextSize = 42
+text.Parent = frame
+
+-- 淡入
+frame.BackgroundTransparency = 1
+text.TextTransparency = 1
+
+TweenService:Create(frame, TweenInfo.new(0.6, Enum.EasingStyle.Quart), {BackgroundTransparency = 0.3}):Play()
+TweenService:Create(text, TweenInfo.new(0.6, Enum.EasingStyle.Quart), {TextTransparency = 0}):Play()
+
+-- 3秒後淡出消失
+task.delay(3, function()
+    TweenService:Create(frame, TweenInfo.new(0.8, Enum.EasingStyle.Quart), {BackgroundTransparency = 1}):Play()
+    TweenService:Create(text, TweenInfo.new(0.8, Enum.EasingStyle.Quart), {TextTransparency = 1}):Play()
+    
+    task.wait(0.9)
+    sg:Destroy()
+end)
+
+print("作者065 載入提示已顯示（3秒後消失）")
