@@ -50,8 +50,8 @@ end)
 
 -- ==================== 功能控制 UI 面板 ====================
 -- 按 Insert 開啟/關閉面板
--- 點擊按鈕 = 直接觸發對應快捷鍵（E N K Q H）
--- 面板半透明、拉長一點
+-- 點擊按鈕觸發對應快捷鍵：E N K Q H F
+-- 半透明、拉長、傳送改 K、無輸入框
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -64,7 +64,7 @@ screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
 -- 主框架（半透明黑底）
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 260, 0, 320)  -- 拉長高度（原本 240 → 320）
+mainFrame.Size = UDim2.new(0, 260, 0, 360)  -- 高度 360 容納 6 個按鈕
 mainFrame.Position = UDim2.new(0.5, -130, 0.4, 0)
 mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 mainFrame.BackgroundTransparency = 0.4      -- 半透明
@@ -94,23 +94,24 @@ title.Font = Enum.Font.GothamBold
 title.TextSize = 18
 title.Parent = mainFrame
 
--- 按鈕列表（傳送改 K）
+-- 按鈕列表（新增 F 飛行，傳送改 K）
 local buttons = {
     {name = "ESP",      key = Enum.KeyCode.E},
     {name = "穿牆",     key = Enum.KeyCode.N},
-    {name = "傳送",     key = Enum.KeyCode.K},  -- 改成 K
+    {name = "傳送",     key = Enum.KeyCode.K},
     {name = "鎖頭",     key = Enum.KeyCode.Q},
     {name = "鎖血",     key = Enum.KeyCode.H},
+    {name = "飛行",     key = Enum.KeyCode.F},
 }
 
 local btnList = {}
 
 for i, btnInfo in ipairs(buttons) do
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.9, 0, 0, 45)      -- 按鈕高度拉大一點
-    btn.Position = UDim2.new(0.05, 0, 0, 45 + (i-1)*52)
+    btn.Size = UDim2.new(0.9, 0, 0, 45)
+    btn.Position = UDim2.new(0.05, 0, 0, 45 + (i-1)*50)
     btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    btn.BackgroundTransparency = 0.5          -- 按鈕也半透明
+    btn.BackgroundTransparency = 0.5          -- 半透明按鈕
     btn.Text = btnInfo.name
     btn.TextColor3 = Color3.fromRGB(200, 200, 200)
     btn.Font = Enum.Font.GothamSemibold
@@ -144,11 +145,9 @@ UserInputService.InputBegan:Connect(function(input, gp)
     end
 end)
 
-print("功能控制 UI 已載入（半透明版）")
+print("半透明功能控制 UI 已載入（含飛行）")
 print("按 Insert 開啟/關閉面板")
-print("點擊按鈕 = 觸發 E / N / K / Q / H 功能")
-
-print("作者065 載入提示已顯示（3秒後消失）")
+print("點擊按鈕觸發 E / N / K / Q / H / F 功能")
 -- Rivals 按 K 瞬移到最近敵人腳下（視角不變）
 -- 每次按 K 傳送到距離最近的活著敵人腳下
 
