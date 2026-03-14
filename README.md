@@ -1,4 +1,4 @@
-# 065ESP-- 低偵測 ESP：Highlight 骨架 + Billboard 血量/距離
+-- 低偵測 ESP：Highlight 骨架 + Billboard 血量/距離
 -- 按 E 開/關 | 2026 安全版
 
 local Players = game:GetService("Players")
