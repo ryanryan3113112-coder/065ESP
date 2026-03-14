@@ -49,6 +49,58 @@ task.delay(3, function()
 end)
 
 print("作者065 載入提示已顯示（3秒後消失）")
+-- Rivals 按 K 瞬移到最近敵人腳下（視角不變）
+-- 每次按 K 傳送到距離最近的活著敵人腳下
+
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local LocalPlayer = Players.LocalPlayer
+
+local function teleportToClosestEnemy()
+    local closestRoot = nil
+    local minDistance = math.huge
+    
+    local myRoot = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+    if not myRoot then
+        print("自己角色或 HumanoidRootPart 未載入")
+        return
+    end
+    
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer and plr.Character then
+            local enemyRoot = plr.Character:FindFirstChild("HumanoidRootPart")
+            local hum = plr.Character:FindFirstChild("Humanoid")
+            
+            if enemyRoot and hum and hum.Health > 0 then
+                local distance = (myRoot.Position - enemyRoot.Position).Magnitude
+                if distance < minDistance then
+                    minDistance = distance
+                    closestRoot = enemyRoot
+                end
+            end
+        end
+    end
+    
+    if not closestRoot then
+        print("沒有找到活著的敵人")
+        return
+    end
+    
+    -- 傳送到敵人腳下（Y軸 +3 避免卡地）
+    myRoot.CFrame = closestRoot.CFrame * CFrame.new(0, 3, 0)
+    print("已瞬移到最近敵人腳下！（距離：" .. math.floor(minDistance) .. " studs）")
+end
+
+UserInputService.InputBegan:Connect(function(input, gp)
+    if gp then return end
+    if input.KeyCode == Enum.KeyCode.K then
+        teleportToClosestEnemy()
+    end
+end)
+
+print("按 K 瞬移到最近敵人腳下 已載入")
+print("每次按 K 會傳送到距離最近的活著敵人腳下")
+print("⚠️ 極高風險功能！Byfron 很容易偵測異常位移，建議小號測試")
 -- 低偵測 ESP：Highlight 骨架 + Billboard 血量/距離
 -- 按 E 開/關 | 2026 安全版
 
