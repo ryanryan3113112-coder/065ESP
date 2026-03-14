@@ -50,8 +50,8 @@ end)
 
 -- ==================== 功能控制 UI 面板 ====================
 -- 按 Insert 開啟/關閉面板
--- 點擊按鈕觸發對應快捷鍵：E N K Q H F
--- 半透明、拉長、傳送改 K、無輸入框
+-- 點擊按鈕觸發對應快捷鍵：E N K Q H F O
+-- 半透明、可拖動、傳送改 K、新增「自動急殺」
 
 local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
@@ -64,8 +64,8 @@ screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
 -- 主框架（半透明黑底）
 local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 260, 0, 360)  -- 高度 360 容納 6 個按鈕
-mainFrame.Position = UDim2.new(0.5, -130, 0.4, 0)
+mainFrame.Size = UDim2.new(0, 260, 0, 450)  -- 高度再拉長到 450，避免字跑出來
+mainFrame.Position = UDim2.new(0.5, -130, 0.35, 0)
 mainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 mainFrame.BackgroundTransparency = 0.4      -- 半透明
 mainFrame.BorderSizePixel = 0
@@ -94,29 +94,30 @@ title.Font = Enum.Font.GothamBold
 title.TextSize = 18
 title.Parent = mainFrame
 
--- 按鈕列表（新增 F 飛行，傳送改 K）
+-- 按鈕列表（含自動急殺 O）
 local buttons = {
-    {name = "ESP",      key = Enum.KeyCode.E},
-    {name = "穿牆",     key = Enum.KeyCode.N},
-    {name = "傳送",     key = Enum.KeyCode.K},
-    {name = "鎖頭",     key = Enum.KeyCode.Q},
-    {name = "鎖血",     key = Enum.KeyCode.H},
-    {name = "飛行",     key = Enum.KeyCode.F},
-    {name = "自動擊殺",   key = Enum.KeyCode.O},
+    {name = "ESP",        key = Enum.KeyCode.E},
+    {name = "穿牆",       key = Enum.KeyCode.N},
+    {name = "傳送",       key = Enum.KeyCode.K},
+    {name = "鎖頭",       key = Enum.KeyCode.Q},
+    {name = "鎖血",       key = Enum.KeyCode.H},
+    {name = "飛行",       key = Enum.KeyCode.F},
+    {name = "自動急殺",   key = Enum.KeyCode.O},
 }
 
 local btnList = {}
 
 for i, btnInfo in ipairs(buttons) do
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0.9, 0, 0, 45)
-    btn.Position = UDim2.new(0.05, 0, 0, 45 + (i-1)*50)
+    btn.Size = UDim2.new(0.9, 0, 0, 50)      -- 按鈕高度加大到 50，避免文字擠壓
+    btn.Position = UDim2.new(0.05, 0, 0, 45 + (i-1)*55)  -- 間距加大到 55
     btn.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    btn.BackgroundTransparency = 0.5          -- 半透明按鈕
+    btn.BackgroundTransparency = 0.5
     btn.Text = btnInfo.name
     btn.TextColor3 = Color3.fromRGB(200, 200, 200)
     btn.Font = Enum.Font.GothamSemibold
     btn.TextSize = 16
+    btn.TextWrapped = true  -- 文字自動換行（防跑出框）
     btn.Parent = mainFrame
     
     local btnCorner = Instance.new("UICorner")
@@ -146,9 +147,9 @@ UserInputService.InputBegan:Connect(function(input, gp)
     end
 end)
 
-print("半透明功能控制 UI 已載入（含飛行）")
+print("半透明功能控制 UI 已載入（含自動急殺）")
 print("按 Insert 開啟/關閉面板")
-print("點擊按鈕觸發 E / N / K / Q / H / F 功能")
+print("點擊按鈕可觸發：ESP / 穿牆 / 傳送 / 鎖頭 / 鎖血 / 飛行 / 自動急殺")
 -- Rivals 按 K 瞬移到最近敵人腳下（視角不變）
 -- 每次按 K 傳送到距離最近的活著敵人腳下
 
