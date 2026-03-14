@@ -331,7 +331,7 @@ end
 
 UserInputService.InputBegan:Connect(function(input, gp)
     if gp then return end
-    if input.KeyCode == Enum.KeyCode.F then
+    if input.KeyCode == Enum.KeyCode.O then
         toggleFly()
     end
 end)
