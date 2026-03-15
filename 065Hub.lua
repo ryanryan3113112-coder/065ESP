@@ -920,3 +920,222 @@ end)
 
 print("按 Insert 開啟/關閉 小型座標 + FPS 顯示 已載入")
 print("小條在左上角，可拖動位置")
+-- Rivals F3 風格 Debug 面板（附近敵人 500 studs + 剩餘敵人 + 經過時間 + 智能 AI）
+-- 按 F3 開啟/關閉
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local Teams = game:GetService("Teams")
+local LocalPlayer = Players.LocalPlayer
+local Camera = workspace.CurrentCamera
+
+local DETECTION_RANGE = 500  -- ← 已改為 500 studs
+
+local panelEnabled = false
+local startTime = tick()  -- 用來計算遊戲開始經過的時間
+
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "F3Panel"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = LocalPlayer:WaitForChild("PlayerGui")
+
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 420, 0, 280)
+mainFrame.Position = UDim2.new(0.5, -210, 0, 10)
+mainFrame.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
+mainFrame.BackgroundTransparency = 0.4
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Visible = false
+mainFrame.Parent = screenGui
+
+local corner = Instance.new("UICorner")
+corner.CornerRadius = UDim.new(0, 8)
+corner.Parent = mainFrame
+
+-- 標題
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 30)
+title.BackgroundTransparency = 1
+title.Text = "F3 Debug 面板 - Rivals"
+title.TextColor3 = Color3.fromRGB(100, 255, 100)
+title.Font = Enum.Font.GothamBlack
+title.TextSize = 18
+title.Parent = mainFrame
+
+-- 資訊文字
+local infoLabel = Instance.new("TextLabel")
+infoLabel.Size = UDim2.new(1, -20, 0, 95)
+infoLabel.Position = UDim2.new(0, 10, 0, 35)
+infoLabel.BackgroundTransparency = 1
+infoLabel.TextColor3 = Color3.fromRGB(200, 200, 255)
+infoLabel.Font = Enum.Font.SourceSans
+infoLabel.TextSize = 15
+infoLabel.TextXAlignment = Enum.TextXAlignment.Left
+infoLabel.TextYAlignment = Enum.TextYAlignment.Top
+infoLabel.TextWrapped = true
+infoLabel.Parent = mainFrame
+
+-- 敵人列表
+local enemiesFrame = Instance.new("Frame")
+enemiesFrame.Size = UDim2.new(1, -20, 0, 115)
+enemiesFrame.Position = UDim2.new(0, 10, 0, 135)
+enemiesFrame.BackgroundTransparency = 1
+enemiesFrame.Parent = mainFrame
+
+local enemiesList = Instance.new("TextLabel")
+enemiesList.Size = UDim2.new(1, 0, 1, 0)
+enemiesList.BackgroundTransparency = 1
+enemiesList.TextColor3 = Color3.fromRGB(255, 255, 255)
+enemiesList.Font = Enum.Font.SourceSans
+enemiesList.TextSize = 14
+enemiesList.TextXAlignment = Enum.TextXAlignment.Left
+enemiesList.TextYAlignment = Enum.TextYAlignment.Top
+enemiesList.TextWrapped = true
+enemiesList.Parent = enemiesFrame
+
+-- AI 策略建議
+local strategyLabel = Instance.new("TextLabel")
+strategyLabel.Size = UDim2.new(1, -20, 0, 40)
+strategyLabel.Position = UDim2.new(0, 10, 1, -50)
+strategyLabel.BackgroundTransparency = 1
+strategyLabel.TextColor3 = Color3.fromRGB(255, 215, 0)
+strategyLabel.Font = Enum.Font.GothamSemibold
+strategyLabel.TextSize = 15
+strategyLabel.Text = "AI 建議：掃描中..."
+strategyLabel.Parent = mainFrame
+
+-- 更新面板
+local lastStrategyUpdate = 0
+
+RunService.Heartbeat:Connect(function()
+    if not panelEnabled then return end
+    
+    local char = LocalPlayer.Character
+    local root = char and char:FindFirstChild("HumanoidRootPart")
+    local hum = char and char:FindFirstChild("Humanoid")
+    if not root or not hum then return end
+    
+    local myHP = math.floor(hum.Health)
+    local myTeam = LocalPlayer.Team
+    
+    -- 判斷是否為隊友（支援 5v5 與 FFA）
+    local function isAlly(plr)
+        if not myTeam then return plr == LocalPlayer end
+        return plr.Team == myTeam
+    end
+    
+    -- 收集資料
+    local nearbyEnemies = {}
+    local ourAlive = 0
+    local enemyAlive = 0
+    local ourTotalHP = 0
+    local enemyTotalHP = 0
+    
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr.Character then
+            local targetHum = plr.Character:FindFirstChild("Humanoid")
+            if targetHum and targetHum.Health > 0 then
+                if isAlly(plr) then
+                    ourAlive += 1
+                    ourTotalHP += targetHum.Health
+                else
+                    enemyAlive += 1
+                    enemyTotalHP += targetHum.Health
+                    
+                    -- 附近敵人（500 studs 內 + 視野內）
+                    local head = plr.Character:FindFirstChild("Head")
+                    if head then
+                        local dist = (root.Position - head.Position).Magnitude
+                        if dist <= DETECTION_RANGE then
+                            local _, onScreen = Camera:WorldToViewportPoint(head.Position)
+                            if onScreen then
+                                table.insert(nearbyEnemies, {
+                                    name = plr.Name,
+                                    hp = math.floor(targetHum.Health),
+                                    dist = math.floor(dist)
+                                })
+                            end
+                        end
+                    end
+                end
+            end
+        end
+    end
+    
+    table.sort(nearbyEnemies, function(a, b) return a.dist < b.dist end)
+    
+    -- 經過時間
+    local elapsed = tick() - startTime
+    local minutes = math.floor(elapsed / 60)
+    local seconds = math.floor(elapsed % 60)
+    local timeStr = string.format("%02d:%02d", minutes, seconds)
+    
+    -- 資訊顯示
+    infoLabel.Text = string.format(
+        "經過時間: %s\n自己血量: %d\n我方: %d人 | 敵方: %d人\n剩餘敵人: %d\n附近敵人: %d (≤%d studs)\nFPS: %d",
+        timeStr, myHP, ourAlive, enemyAlive, enemyAlive, #nearbyEnemies, DETECTION_RANGE, math.floor(1 / RunService.Heartbeat:Wait())
+    )
+    
+    -- 敵人列表
+    local enemyText = string.format("附近敵人 (≤ %d studs):\n", DETECTION_RANGE)
+    if #nearbyEnemies == 0 then
+        enemyText = enemyText .. "  目前 500 studs 內無敵人"
+    else
+        for _, e in ipairs(nearbyEnemies) do
+            enemyText = enemyText .. string.format("  %s | HP: %d | %d studs\n", e.name, e.hp, e.dist)
+        end
+    end
+    enemiesList.Text = enemyText
+    
+    -- AI 建議（每 2 秒更新，調整距離門檻以適應 500 studs 範圍）
+    if tick() - lastStrategyUpdate >= 2 then
+        lastStrategyUpdate = tick()
+        
+        local nearbyCount = #nearbyEnemies
+        local minDist = nearbyCount > 0 and nearbyEnemies[1].dist or 999
+        local playerGap = ourAlive - enemyAlive
+        local hpGap = math.floor(ourTotalHP - enemyTotalHP)
+        
+        local suggestion = "AI 建議："
+        
+        if enemyAlive == 0 then
+            suggestion = suggestion .. "敵方全滅！推進或守勝"
+        elseif nearbyCount > 0 and minDist <= 70 then   -- 近距離調整
+            local closestHP = nearbyEnemies[1].hp
+            if closestHP <= 50 then
+                suggestion = suggestion .. "近身低血敵！衝上去補刀"
+            else
+                suggestion = suggestion .. "近距離高血 → 走位 + 預瞄"
+            end
+        elseif playerGap >= 3 and hpGap > 200 then
+            suggestion = suggestion .. "我方大優勢 → 全隊推進壓制"
+        elseif playerGap <= -3 or hpGap < -250 then
+            suggestion = suggestion .. "我方劣勢 → 防守拉距 / 等復活"
+        elseif nearbyCount >= 4 then
+            suggestion = suggestion .. "附近多人 → 打游擊 / 找高地"
+        elseif minDist <= 180 then   -- 中距離調整（500 範圍內）
+            suggestion = suggestion .. "中距離接觸 → 掩體移動戰"
+        elseif enemyAlive >= 5 then
+            suggestion = suggestion .. "敵人仍多 → 小心側翼 / 耗戰"
+        else
+            suggestion = suggestion .. "遠距離敵人 → 狙擊或等待機會"
+        end
+        
+        strategyLabel.Text = suggestion
+    end
+end)
+
+-- 按 F3 開關
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+    if input.KeyCode == Enum.KeyCode.F3 then
+        panelEnabled = not panelEnabled
+        mainFrame.Visible = panelEnabled
+    end
+end)
+
+print("Rivals F3 面板已更新：偵測範圍 500 studs")
+print("按 F3 開啟/關閉")
