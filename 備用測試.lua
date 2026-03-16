@@ -147,9 +147,7 @@ UserInputService.InputBegan:Connect(function(input, gp)
     end
 end)
 
-print("半透明功能控制 UI 已載入（飛行改 Z，面板左邊）")
-print("按 Insert 開啟/關閉面板")
-print("點擊按鈕可觸發：ESP / 穿牆 / 傳送 / 鎖頭 / 鎖血 / 飛行(Z) / 自動急殺")
+
 -- Rivals 按 K 瞬移到最近敵人腳下（視角不變）
 -- 每次按 K 傳送到距離最近的活著敵人腳下
 
@@ -199,9 +197,7 @@ UserInputService.InputBegan:Connect(function(input, gp)
     end
 end)
 
-print("按 K 瞬移到最近敵人腳下 已載入")
-print("每次按 K 會傳送到距離最近的活著敵人腳下")
-print("⚠️ 極高風險功能！Byfron 很容易偵測異常位移，建議小號測試")
+
 -- 低偵測 ESP：Highlight 骨架 + Billboard 血量/距離
 -- 按 E 開/關 | 2026 安全版
 
@@ -453,7 +449,7 @@ LocalPlayer.CharacterAdded:Connect(function(char)
     end
 end)
 
-print("按 N 穿牆（強化版）已載入")
+
 
 
 
@@ -549,8 +545,7 @@ LocalPlayer.CharacterAdded:Connect(function()
     end
 end)
 
-print("按 F 起飛腳本已載入")
-print("WASD 移動 | Space 上昇 | Ctrl 下降")
+
 
 -- 白圓框 FOV 自瞄鎖定（玩家進入圓框就鎖視角）
 -- 按 Q 開/關 | 白圓框在畫面中央 | 自動鎖最近進入框的敵人頭部
@@ -646,9 +641,6 @@ LocalPlayer.CharacterAdded:Connect(function()
     end
 end)
 
-print("白圓框 FOV 自瞄已載入")
-print("按 Q 開/關 | 敵人進入白圓就自動鎖頭")
-print("⚠️ 極高風險功能，Byfron 很容易偵測，建議小號短時間測試")
 
 
 -- Godmode / HP 鎖定腳本（按 H 開關）
@@ -737,10 +729,7 @@ LocalPlayer.CharacterAdded:Connect(function(char)
     end
 end)
 
-print("Godmode / HP 鎖定 已載入")
-print("按 H 開/關 | 開啟後血量鎖最大（客戶端假無敵）")
-print("⚠️ 高風險！很多遊戲會偵測異常血量變化 → 容易被踢或 ban")
-print("建議：只在私人伺服器或小號短暫測試")
+
 
 -- 按 O 鍵：自動瞬移到最近敵人身上 + 鎖頭 + 自動開槍 (AUTO KILL)
 -- 按一次 O 開啟/關閉
@@ -838,10 +827,7 @@ LocalPlayer.CharacterAdded:Connect(function()
     end
 end)
 
-print("按 O 開啟/關閉 AUTO KILL 已載入")
-print("瞬移到敵人身上 + 鎖頭 + 自動開槍")
-print("⚠️ 極高風險！Byfron 會立刻偵測異常位移、視角、射擊，ban 機率極高")
-print("只適合小號測試，開 1 局就關")
+
 -- 按 Insert 顯示/隱藏 小型座標 + FPS UI
 -- 左上角小條，半透明、可拖動
 
@@ -918,8 +904,7 @@ UserInputService.InputBegan:Connect(function(input, gp)
     end
 end)
 
-print("按 Insert 開啟/關閉 小型座標 + FPS 顯示 已載入")
-print("小條在左上角，可拖動位置")
+
 -- Rivals F3 風格 Debug 面板（附近敵人 500 studs + 剩餘敵人 + 經過時間 + 智能 AI）
 -- 按 F3 開啟/關閉
 
@@ -1106,16 +1091,16 @@ RunService.Heartbeat:Connect(function()
         elseif nearbyCount > 0 and minDist <= 70 then   -- 近距離調整
             local closestHP = nearbyEnemies[1].hp
             if closestHP <= 50 then
-                suggestion = suggestion .. "近身低血敵！衝上去補刀"
+                suggestion = suggestion .. "近身低血敵！請補刀"
             else
-                suggestion = suggestion .. "近距離高血 → 走位 + 預瞄"
+                suggestion = suggestion .. "近距離高血 → 後撤架槍"
             end
         elseif playerGap >= 3 and hpGap > 200 then
-            suggestion = suggestion .. "我方大優勢 → 全隊推進壓制"
+            suggestion = suggestion .. "我方大優勢 → 直接攻擊"
         elseif playerGap <= -3 or hpGap < -250 then
-            suggestion = suggestion .. "我方劣勢 → 防守拉距 / 等復活"
+            suggestion = suggestion .. "我方劣勢 → 拉距 耗血"
         elseif nearbyCount >= 4 then
-            suggestion = suggestion .. "附近多人 → 打游擊 / 找高地"
+            suggestion = suggestion .. "附近多人 → 請架槍躲藏 / 找高地"
         elseif minDist <= 180 then   -- 中距離調整（500 範圍內）
             suggestion = suggestion .. "中距離接觸 → 掩體移動戰"
         elseif enemyAlive >= 5 then
@@ -1137,5 +1122,4 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
     end
 end)
 
-print("Rivals F3 面板已更新：偵測範圍 500 studs")
-print("按 F3 開啟/關閉")
+
