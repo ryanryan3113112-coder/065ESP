@@ -1091,22 +1091,22 @@ RunService.Heartbeat:Connect(function()
         elseif nearbyCount > 0 and minDist <= 70 then   -- 近距離調整
             local closestHP = nearbyEnemies[1].hp
             if closestHP <= 50 then
-                suggestion = suggestion .. "近身低血敵！請補刀"
+                suggestion = suggestion .. "近身低血敵！使用Auto kill"
             else
-                suggestion = suggestion .. "近距離高血 → 後撤架槍"
+                suggestion = suggestion .. "近距離高血 → 傳送鎖頭"
             end
         elseif playerGap >= 3 and hpGap > 200 then
-            suggestion = suggestion .. "我方大優勢 → 直接攻擊"
+            suggestion = suggestion .. "我方大優勢 → 開啟鎖頭追擊"
         elseif playerGap <= -3 or hpGap < -250 then
-            suggestion = suggestion .. "我方劣勢 → 拉距 耗血"
+            suggestion = suggestion .. "我方劣勢 → 開啟鎖血鎖頭穿牆"
         elseif nearbyCount >= 4 then
-            suggestion = suggestion .. "附近多人 → 請架槍躲藏 / 找高地"
+            suggestion = suggestion .. "附近多人 → 開啟飛行穿牆"
         elseif minDist <= 180 then   -- 中距離調整（500 範圍內）
             suggestion = suggestion .. "中距離接觸 → 掩體移動戰"
         elseif enemyAlive >= 5 then
-            suggestion = suggestion .. "敵人仍多 → 小心側翼 / 耗戰"
+            suggestion = suggestion .. "敵人仍多 → 鎖頭穿牆逐個擊破"
         else
-            suggestion = suggestion .. "遠距離敵人 → 狙擊或等待機會"
+            suggestion = suggestion .. "遠距離敵人 → 開啟鎖頭傳送"
         end
         
         strategyLabel.Text = suggestion
