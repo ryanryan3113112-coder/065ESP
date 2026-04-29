@@ -168,7 +168,7 @@ Players.PlayerRemoving:Connect(removeESP)
 -- 按 E 切換
 UserInputService.InputBegan:Connect(function(input, gameProcessed)
     if gameProcessed then return end
-    if input.KeyCode == Enum.KeyCode.E then
+    if input.KeyCode == Enum.KeyCode.x then
         ESP_ENABLED = not ESP_ENABLED
         print("ESP 現在：" .. (ESP_ENABLED and "開啟" or "關閉"))
         
