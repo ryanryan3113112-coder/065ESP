@@ -6,7 +6,7 @@ local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
 
 local LocalPlayer = Players.LocalPlayer
-local flyEnabled = false
+local flyEnabled = ture
 local flySpeed = 50
 
 local bv = nil
